@@ -10,8 +10,8 @@ var Storage Store = newMemoryStore()
 
 // Store is the main interface of storage in this app.
 type Store interface {
-	// Accept to store data, will return error if the UniqueID exists.
-	Accept(uniqueID UniqueID) error
+	// Put to store data, will return error if the UniqueID exists.
+	Put(uniqueID UniqueID) error
 }
 
 // MemoryStore is a dummy in memory storage. It can be replaced with any storage.
@@ -26,11 +26,11 @@ func newMemoryStore() Store {
 	return &MemoryStore{kv: make(map[UniqueID]struct{})}
 }
 
-func (m *MemoryStore) Accept(uniqueID UniqueID) error {
+func (m *MemoryStore) Put(uniqueID UniqueID) error {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	if _, exist := m.kv[uniqueID]; exist {
-		return errors.New("Duplicated data")
+		return errors.New("duplicated data")
 	}
 	// Save dummy data.
 	m.kv[uniqueID] = struct{}{}

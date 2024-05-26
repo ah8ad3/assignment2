@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
@@ -36,7 +35,7 @@ func (rl *RateLimiter) Allow() bool {
 	defer rl.lock.Unlock()
 
 	// Check if we need to reset the counter.
-	if time.Since(rl.lastReset) >= time.Minute {
+	if time.Since(rl.lastReset) >= rl.leaseCycle {
 		rl.requestsCount = 0
 		rl.lastReset = time.Now()
 	}
@@ -50,17 +49,5 @@ func (rl *RateLimiter) Allow() bool {
 	return true
 }
 
-func main() {
-	// Create a rate limiter that allows a maximum of 10 requests per minute
-	limiter := NewRateLimiter(10)
-
-	// Simulate requests
-	for i := 0; i < 20; i++ {
-		if limiter.Allow() {
-			fmt.Printf("Request %d allowed\n", i)
-		} else {
-			fmt.Printf("Request %d denied\n", i)
-		}
-		time.Sleep(5 * time.Second) // Simulate request processing time
-	}
-}
+// ConsistData to save the rate limit data on distributed system.
+func (rl *RateLimiter) ConsistData() {}
